@@ -65,35 +65,7 @@ export function compile(
     // TODO: fix the index 0 access... What if program have multiple source files?
     const printed = printer.printNode(ts.EmitHint.SourceFile, result.transformed[0], sourceFiles[0]);
 
-    const inputSource = fs.readFileSync(filePath, 'utf-8');
-    const prettierOptions = getPrettierOptions(filePath, inputSource, incomingPrettierOptions);
-    const options = Object.assign(
-        {
-            arrowParens: 'avoid',
-            bracketSpacing: true,
-            jsxBracketSameLine: false,
-            printWidth: 80,
-            proseWrap: undefined,
-            semi: true,
-            singleQuote: false,
-            tabWidth: 2,
-            trailingComma: 'none',
-            useTabs: false,
-            parser: 'babel',
-        },
-        incomingPrettierOptions,
-    );
-    try {
-        return prettier.format(printed, options);
-    } catch (prettierError) {
-        if (compilationOptions.ignorePrettierErrors) {
-            console.warn(`Prettier failed for ${filePath} (ignorePrettierErrors is on):`);
-            console.warn(printed);
-            console.warn(prettierError);
-            return printed;
-        }
-        throw prettierError;
-    }
+    return printed;
 }
 
 /**

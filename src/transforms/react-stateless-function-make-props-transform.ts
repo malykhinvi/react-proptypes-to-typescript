@@ -83,11 +83,11 @@ function visitReactStatelessComponent(
 
     const propType = getPropTypesFromTypeAssignment(propTypesExpressionStatement);
     const shouldMakePropTypeDeclaration = propType.members.length > 0;
-    const propTypeName = `${componentName}Props`;
-    const propTypeDeclaration = ts.createTypeAliasDeclaration([], [], propTypeName, [], propType);
+    const propTypeName = `IProps`;
+    const propTypeDeclaration = ts.createInterfaceDeclaration([], [], propTypeName, [], [], propType.members);
     const propTypeRef = ts.createTypeReferenceNode(propTypeName, []);
 
-    let componentType = ts.createTypeReferenceNode(ts.createQualifiedName(ts.createIdentifier('React'), 'SFC'), [
+    let componentType = ts.createTypeReferenceNode(ts.createQualifiedName(ts.createIdentifier('React'), 'FC'), [
         shouldMakePropTypeDeclaration ? propTypeRef : propType,
     ]);
 

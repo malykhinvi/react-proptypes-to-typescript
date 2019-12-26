@@ -48,19 +48,11 @@ function visitReactClassDeclaration(
     const states = getStatesOfReactComponentClass(classDeclaration, typeChecker);
     const shouldMakePropTypeDeclaration = interfaceMembers.length > 0;
     const shouldMakeStateTypeDeclaration = !isStateMemberEmpty(states);
-    const propTypeName = `I${className}Props`;
-    const stateTypeName = `${className}State`;
-    const interfaceHeritageClause = createInterfaceHeritageClause();
-    const propsInterfaceDeclaration = ts.createInterfaceDeclaration(
-        [],
-        [],
-        propTypeName,
-        [],
-        [interfaceHeritageClause],
-        interfaceMembers,
-    );
+    const propTypeName = `IProps`;
+    const stateTypeName = `IState`;
+    const propsInterfaceDeclaration = ts.createInterfaceDeclaration([], [], propTypeName, [], [], interfaceMembers);
 
-    const stateTypeDeclaration = ts.createTypeAliasDeclaration([], [], stateTypeName, [], states);
+    const stateTypeDeclaration = ts.createInterfaceDeclaration([], [], stateTypeName, [], [], states.members);
     const propTypeRef = ts.createTypeReferenceNode(propTypeName, []);
     const stateTypeRef = ts.createTypeReferenceNode(stateTypeName, []);
 
@@ -170,7 +162,7 @@ function getPropsTypeOfReactComponentClass(
 function getStatesOfReactComponentClass(
     classDeclaration: ts.ClassDeclaration,
     typeChecker: ts.TypeChecker,
-): ts.TypeNode {
+): ts.TypeLiteralNode {
     const members: ts.PropertySignature[] = [];
     const addMember = (name: ts.Identifier) => {
         const text = name ? name.text : '';
@@ -267,16 +259,6 @@ function isStateMemberEmpty(stateType: ts.TypeNode): boolean {
     }
 
     return stateType.types.every(isStateMemberEmpty);
-}
-
-/**
- * interface extends React.HTMLAttributes<Element>
- */
-function createInterfaceHeritageClause() {
-    const expression = ts.createPropertyAccess(ts.createIdentifier('React'), 'HTMLAttributes');
-    const typeReference = ts.createTypeReferenceNode('Element', []);
-    const expressionWithTypeArguments = ts.createExpressionWithTypeArguments([typeReference], expression);
-    return ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [expressionWithTypeArguments]);
 }
 
 function getPropsOfReactComponentClass(
